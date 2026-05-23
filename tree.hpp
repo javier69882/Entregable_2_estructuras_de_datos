@@ -3,7 +3,11 @@
 #include <iostream>
 //codigo modificado de lab 7
 
-
+struct Libro_similar{
+    std::string titulo;
+    std::string isbn;
+    int anio_publicacion;
+};
 struct Libro{ // almacena la informacion del xml sobre los libros
     std::string id;
     std::string titulo;
@@ -13,6 +17,9 @@ struct Libro{ // almacena la informacion del xml sobre los libros
     std::string descripcion;
     float rating_promedio;
     int num_paginas;
+
+    //vector de libros similares
+    std::vector<Libro_similar> libros_similares;
 };
 
 
