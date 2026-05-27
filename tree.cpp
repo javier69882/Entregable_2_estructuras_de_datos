@@ -2,16 +2,22 @@
 #include <algorithm>
 #include <functional>
 
-// Node
-Tree::Node::Node(Libro value, Node* p) {
-    data = value;
+// constructor del nodo
+Tree::Node::Node(std::string tag, std::string val, Node* p) {
+    etiqueta = tag;
+    valor = val;
     parent = p;
 }
 
-// Constructor
-Tree::Tree() {
-    rootNode = nullptr;
-    treeSize = 0;
+//Constructor del arbol
+Tree::Tree(std::string rootTag, std::string rootVal) {
+    rootNode = new Node(rootTag, rootVal);
+    treeSize = 1;
+}
+
+// Destructor
+Tree::~Tree() {
+    deleteSubtree(rootNode);
 }
 
 bool Tree::isEmpty() {
@@ -22,71 +28,53 @@ int Tree::size() {
     return treeSize;
 }
 
-std::string Tree::root() {
-    if (!rootNode) throw std::runtime_error("Árbol vacío");
-    return rootNode->data.id;
+Tree::Node* Tree::getRoot() {
+    return rootNode;
 }
 
-Tree::Node* Tree::search(Node* node, std::string id) {
+//busqueda por etiqueta y valor
+Tree::Node* Tree::search(Node* node, std::string etiqueta_buscada, std::string valor_buscado) {
     if (!node) return nullptr;
-    if (node->data.id == id) return node;
+    
+    // Verificamos si coincide la etiqueta, y si se pasa un valor a buscar, tambien se verifica
+    if (node->etiqueta == etiqueta_buscada && (valor_buscado == "" || node->valor == valor_buscado)) {
+        return node;
+    }
 
+    //si no es el actual, busca recursivamente en los hijos
     for (auto child : node->children) {
-        Node* found = search(child, id);
+        Node* found = search(child, etiqueta_buscada, valor_buscado);
         if (found) return found;
     }
     return nullptr;
 }
 
-bool Tree::insert(std::string parentId, Libro value) {
-    if (!rootNode) {
-        rootNode = new Node(value);
-        treeSize++;
-        return true;
-    }
+// inserta nuevo nodo con etiqueta y valor debajo del nodo padre dado
+Tree::Node* Tree::insert(Node* parentNode, std::string etiqueta, std::string valor) {
+    if (!parentNode) return nullptr;
 
-    Node* parentNode = search(rootNode, parentId);
-    if (!parentNode) return false;
-
-    //if ((int)parentNode->children.size() >= k) return false;
-
-    Node* newNode = new Node(value, parentNode);
+    Node* newNode = new Node(etiqueta, valor, parentNode);
     parentNode->children.push_back(newNode);
     treeSize++;
-    return true;
+    return newNode;
 }
 
-std::string Tree::parent(std::string id) {
-    Node* node = search(rootNode, id);
-    if (!node || !node->parent)
-        throw std::runtime_error("No tiene padre");
+   
 
-    return node->parent->data.id;
-}
-
-std::vector<std::string> Tree::children(std::string id) {
-    Node* node = search(rootNode, id);
-    std::vector<std::string> result;
-
-    if (!node) return result;
-
-    for (auto child : node->children)
-        result.push_back(child->data.id);
-
-    return result;
-}
 
 void Tree::deleteSubtree(Node* node) {
     if (!node) return;
-    for (auto child : node->children)
+    for (auto child : node->children) {
         deleteSubtree(child);
+    }
     delete node;
 }
 
-bool Tree::remove( std::string id) {
-    Node* node = search(rootNode, id);
+// Borrado directo por puntero
+bool Tree::remove(Node* node) {
     if (!node) return false;
 
+    //evito borrar la raiz padre total
     if (node == rootNode) {
         deleteSubtree(rootNode);
         rootNode = nullptr;
@@ -97,43 +85,49 @@ bool Tree::remove( std::string id) {
     Node* parent = node->parent;
     auto& siblings = parent->children;
 
+    //se borra el puntero en el vecto del padre
     siblings.erase(
         std::remove(siblings.begin(), siblings.end(), node),
         siblings.end()
     );
 
+    //se libera la memoria del subarbol
     deleteSubtree(node);
     treeSize--;
     return true;
 }
 
 
-void Tree::preOrder(Node* node, std::vector<std::string>& result) {
+//recorre en preodrder y guarda los nodos en un vector
+void Tree::preOrder(Node* node, std::vector<Node*>& result) {
     if (!node) return;
-    result.push_back(node->data.id);
-    for (auto child : node->children)
+    result.push_back(node);
+    for (auto child : node->children) {
         preOrder(child, result);
+    }
 }
 
-std::vector<std::string> Tree::preOrder() {
-    std::vector<std::string> result;
+std::vector<Tree::Node*> Tree::preOrder() {
+    std::vector<Node*> result;
     preOrder(rootNode, result);
     return result;
 }
 
-void Tree::postOrder(Node* node, std::vector<std::string>& result) {
+//recorre en postorder y guarda los nodos en un vector
+void Tree::postOrder(Node* node, std::vector<Node*>& result) {
     if (!node) return;
-    for (auto child : node->children)
+    for (auto child : node->children) {
         postOrder(child, result);
-    result.push_back(node->data.id);
+    }
+    result.push_back(node);
 }
 
-std::vector<std::string> Tree::postOrder() {
-    std::vector<std::string> result;
+std::vector<Tree::Node*> Tree::postOrder() {
+    std::vector<Node*> result;
     postOrder(rootNode, result);
     return result;
 }
-
+/*
 std::vector<std::string> Tree::inOrder() {
     std::vector<std::string> result;
 
@@ -154,6 +148,7 @@ std::vector<std::string> Tree::inOrder() {
     inorder(rootNode);
     return result;
 }
+    */
 
 //funciones que pide el enunciado
 void Tree::listar() {
