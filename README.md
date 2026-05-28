@@ -17,6 +17,7 @@ El objetivo es practicar recorridos y operaciones sobre estructuras de datos (in
 - `tree.hpp` / `tree.cpp` — implementación del ADT árbol general y métodos requeridos.
 - `pugixml.cpp` / `pugixml.hpp` — parser XML integrado.
 - `books_xml/` — carpeta con los archivos XML de entrada.
+- `estructura arbol.png/` — diagrama inicial para el modelamiento del árbol. Se acaba optando por la opción de la derecha.
 
 ## Funcionalidad implementada
 
