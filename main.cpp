@@ -92,7 +92,8 @@ int main() {
     std::cout << "Tiempo total de carga: " << duracionSegundos.count() << " segundos." << std::endl;
     // listamos los id de los libros cargados en el arbol, para verificar que se cargaron correctamente
     std::cout << "Lista de IDs de los libros:" << std::endl;
-    miArbol.listar();
-  //miArbol.print(30);
+    // miArbol.listar();
+    // miArbol.borrar_ratings(4.5);
+    miArbol.print(10);
     return 0;
 }

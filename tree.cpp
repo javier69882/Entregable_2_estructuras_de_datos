@@ -180,7 +180,29 @@ void Tree::listar() { // lista los id de los libros que cuelgan directamente de 
 }
 
 void Tree::borrar_ratings(float r) {
+    if(!rootNode) return;
+    //vector para amacenar los nodos a borrar
+    std::vector<Node*> libros_a_borrar;
+    // recorre hijos de la raiz padre total
+    for(Node* libro : rootNode->children){
+        // busca el nodo average_rating dentro de los hijos del nodo L
+        for(Node* atributo : libro->children){
+            if (atributo->etiqueta == "average_rating"){
 
+                //convierte el string a float
+                float rating = std::stof(atributo->valor);
+                // si el rating es menor se añade al vector
+                if(rating <= r){
+                    libros_a_borrar.push_back(libro);
+                }
+                break;
+            }
+        }
+    }
+    //borra los nodso en el vector
+    for (Node* libro : libros_a_borrar){
+        remove(libro);
+    }
     }
 
 std::vector<std::string> Tree::precursores(std::string id) {
@@ -229,7 +251,7 @@ void Tree::print(int limiteLibros) {
     for (auto libro : rootNode->children) {
         if (librosImpresos >= limiteLibros) {
             std::cout << "    |-- ... (y " << (rootNode->children.size() - limiteLibros) 
-                      << " libros más)" << std::endl;
+                      << " libros mas)" << std::endl;
             break;
         }
         
