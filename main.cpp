@@ -90,7 +90,11 @@ int main() {
     std::chrono::duration<double> duracionSegundos = tiempoFin - tiempoInicio;
 
     std::cout << "Tiempo total de carga: " << duracionSegundos.count() << " segundos." << std::endl;
-    std::cout << "IDs de libros cuyos libros similares son posteriores:" << std::endl;
-    miArbol.precursores();
+    //std::cout << "IDs de libros que cuelgan directamente de la raiz total:" << std::endl;
+    //miArbol.listar();
+    //miArbol.borrar_ratings(4.0);
+    //miArbol.print(10);
+    // std::cout << "IDs de libros cuyos libros similares son posteriores:" << std::endl;
+    // miArbol.precursores();
     return 0;
 }
