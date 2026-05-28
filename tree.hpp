@@ -39,7 +39,7 @@ public:
         Node(std::string tag, std::string val, Node* p = nullptr);
     };
 private:
-
+void print(Node* node, int depth);
     Node* rootNode;
     int treeSize;
     //int k; lo quito porque ahora el arbol no tiene numero fijo de hijos
@@ -50,6 +50,7 @@ private:
 
 public:
     //EL arbol inica con un nodo raiz
+     void print(int limiteLibros = 3);
     Tree(std::string rootTag, std::string rootVal = "");
     ~Tree();
     bool isEmpty();

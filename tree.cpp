@@ -187,3 +187,54 @@ std::vector<std::string> Tree::precursores(std::string id) {
     std::vector<std::string> resultado;
     return resultado;
 }
+
+
+
+// Función privada recursiva
+void Tree::print(Node* node, int depth) {
+    if (!node) return;
+
+    
+    for (int i = 0; i < depth; ++i) {
+        std::cout << "    "; 
+    }
+
+    // Imprimimos la etiqueta del nodo
+    std::cout << "|-- " << node->etiqueta;
+
+    // Si el nodo tiene un valor de texto, lo mostramos al lado
+    if (!node->valor.empty()) {
+        std::cout << ": " << node->valor;
+    }
+    std::cout << std::endl;
+
+    // Llamada recursiva para todos los hijos directos
+    for (auto child : node->children) {
+        print(child, depth + 1);
+    }
+}
+
+// Función publica contenedora
+void Tree::print(int limiteLibros) {
+    if (!rootNode) {
+        std::cout << "El árbol está vacío." << std::endl;
+        return;
+    }
+
+    // Imprimimos la raíz total
+    std::cout << "|-- " << rootNode->etiqueta << std::endl;
+
+    int librosImpresos = 0;
+    // Recorremos los hijos de la raíz 
+    for (auto libro : rootNode->children) {
+        if (librosImpresos >= limiteLibros) {
+            std::cout << "    |-- ... (y " << (rootNode->children.size() - limiteLibros) 
+                      << " libros más)" << std::endl;
+            break;
+        }
+        
+        // Llamamos al asistente recursivo para que imprima este libro con todos sus atributos
+        print(libro, 1);
+        librosImpresos++;
+    }
+}

@@ -4,63 +4,74 @@
 #include "tree.hpp"
 #include "pugixml.hpp"
 #include <chrono>
+#include <algorithm> //
 
 namespace fs = std::filesystem;
 
 void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
-    //raiz padre total dl arbol
     Tree::Node* nodoRaiz = miArbol.getRoot(); 
-    int contador = 0;
-    //se itera por los primeros 10000 archivos del xml
+    
+    // 1. Guardar todos los archivos en un vector temporal
+    std::vector<fs::directory_entry> archivos;
     for (const auto& entry : fs::directory_iterator(rutaCarpeta)) {
-        if (contador >= 10000) break; // 
         if (fs::is_regular_file(entry.status())) {
+            archivos.push_back(entry);
+        }
+    }
+
+    // 2. Ordenar el vector numéricamente
+    std::sort(archivos.begin(), archivos.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
+        try {
+            int numA = std::stoi(a.path().stem().string());
+            int numB = std::stoi(b.path().stem().string());
+            return numA < numB; 
+        } catch (...) {
+            return a.path().filename() < b.path().filename();
+        }
+    });
+
+    // 3. Iterar y procesar solo los primeros 10000 ordenados
+    int contador = 0;
+    for (const auto& entry : archivos) {
+        if (contador >= 10000) break; 
+        
+        pugi::xml_document doc;
+        pugi::xml_parse_result result = doc.load_file(entry.path().c_str());
+
+        if (result) {
+            pugi::xml_node xmlBook = doc.child("GoodreadsResponse").child("book");
             
-            pugi::xml_document doc;
-            pugi::xml_parse_result result = doc.load_file(entry.path().c_str());
+            if (xmlBook) {
+                Tree::Node* bookNode = miArbol.insert(nodoRaiz, "L");
 
-            if (result) {
-                pugi::xml_node xmlBook = doc.child("GoodreadsResponse").child("book");
-                
-                if (xmlBook) {
-                    // Creamos el nodo "L" de libro que
-                    Tree::Node* bookNode = miArbol.insert(nodoRaiz, "L");
+                miArbol.insert(bookNode, "Id", xmlBook.child_value("id"));
+                miArbol.insert(bookNode, "Nom", xmlBook.child_value("title"));
+                miArbol.insert(bookNode, "isbn", xmlBook.child_value("isbn"));
+                miArbol.insert(bookNode, "F", xmlBook.child_value("publication_year"));
+                miArbol.insert(bookNode, "language_code", xmlBook.child_value("language_code"));
+                miArbol.insert(bookNode, "description", xmlBook.child_value("description"));
+                miArbol.insert(bookNode, "average_rating", xmlBook.child_value("average_rating"));
+                miArbol.insert(bookNode, "num_pages", xmlBook.child_value("num_pages"));
 
-                    // ponemos los atributos del libro bajo el nodo "L"
-                    miArbol.insert(bookNode, "Id", xmlBook.child_value("id"));
-                    miArbol.insert(bookNode, "Nom", xmlBook.child_value("title"));
-                    miArbol.insert(bookNode, "isbn", xmlBook.child_value("isbn"));
-                    miArbol.insert(bookNode, "F", xmlBook.child_value("publication_year"));
-                    miArbol.insert(bookNode, "language_code", xmlBook.child_value("language_code"));
-                    miArbol.insert(bookNode, "description", xmlBook.child_value("description"));
-                    miArbol.insert(bookNode, "average_rating", xmlBook.child_value("average_rating"));
-                    miArbol.insert(bookNode, "num_pages", xmlBook.child_value("num_pages"));
+                pugi::xml_node xmlSimilarBooks = xmlBook.child("similar_books");
+                Tree::Node* similaresNode = miArbol.insert(bookNode, "S");
 
-                    // ponemos el nodo "S" de similares debajo del nodo "L"
-                    pugi::xml_node xmlSimilarBooks = xmlBook.child("similar_books");
-                    Tree::Node* similaresNode = miArbol.insert(bookNode, "S");
+                for (pugi::xml_node simBook = xmlSimilarBooks.child("book"); simBook; simBook = simBook.next_sibling("book")) {
+                    Tree::Node* simBookNode = miArbol.insert(similaresNode, "Ls");
 
-                    //Iteramos por cada libro similar en el XML
-                    for (pugi::xml_node simBook = xmlSimilarBooks.child("book"); simBook; simBook = simBook.next_sibling("book")) {
-                        
-                        // ponemos el nodo "Ls" de libro similar debajo del nodo "S"
-                        Tree::Node* simBookNode = miArbol.insert(similaresNode, "Ls");
-
-                        //ponemos los atributos del libro similar denajo del nodo "Ls"
-                        miArbol.insert(simBookNode, "Nom", simBook.child_value("title"));
-                        miArbol.insert(simBookNode, "Id", simBook.child_value("id"));
-                        miArbol.insert(simBookNode, "isbn", simBook.child_value("isbn"));
-                        miArbol.insert(simBookNode, "F", simBook.child_value("publication_year"));
-                    }
+                    // También agregué el Id de los libros similares para que quede igual al diagrama
+                    miArbol.insert(simBookNode, "Id", simBook.child_value("id")); 
+                    miArbol.insert(simBookNode, "Nom", simBook.child_value("title"));
+                    miArbol.insert(simBookNode, "isbn", simBook.child_value("isbn"));
+                    miArbol.insert(simBookNode, "F", simBook.child_value("publication_year"));
                 }
-            } else {
-                std::cerr << "Error al leer el archivo: " << entry.path().filename() << "\n";
             }
+        } else {
+            std::cerr << "Error al leer el archivo: " << entry.path().filename() << "\n";
         }
         contador++;
     }
 }
-
 int main() {
     // iniciamos el arbol con un nodo raiz "total"
     Tree miArbol("total");
@@ -82,5 +93,6 @@ int main() {
     // listamos los id de los libros cargados en el arbol, para verificar que se cargaron correctamente
     std::cout << "Lista de IDs de los libros:" << std::endl;
     miArbol.listar();
+  //miArbol.print(30);
     return 0;
 }
