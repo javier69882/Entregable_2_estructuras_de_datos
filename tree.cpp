@@ -151,8 +151,32 @@ std::vector<std::string> Tree::inOrder() {
     */
 
 //funciones que pide el enunciado
-void Tree::listar() {
- 
+void Tree::listar() { // lista los id de los libros que cuelgan directamente de la raiz total, en formato [id1, id2, id3]
+    if (!rootNode) return;
+    std::vector<Node*> nodos = preOrder(); // se recorre el arbol en preorder para obtener todos los nodos en un vector
+    std::vector<std::string> ids;
+
+    for (Node* nodo : nodos) { // se itera por todos los nodos del arbol
+        if (nodo == rootNode) continue;
+
+        // solo interesan los libros que cuelgan directamente de la raiz.
+        if (nodo->parent == rootNode && nodo->etiqueta == "L") {
+            for (Node* hijo : nodo->children) {
+                if (hijo->etiqueta == "Id" && !hijo->valor.empty()) {
+                    ids.push_back(hijo->valor);
+                    break;
+                }
+            }
+        }
+    }
+
+    // imprimir en el formato mencionado
+    std::cout << "[";
+    for (size_t i = 0; i < ids.size(); ++i) {
+        std::cout << ids[i];
+        if (i + 1 < ids.size()) std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
 }
 
 void Tree::borrar_ratings(float r) {

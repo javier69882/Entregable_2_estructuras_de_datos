@@ -48,6 +48,7 @@ void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
 
                         //ponemos los atributos del libro similar denajo del nodo "Ls"
                         miArbol.insert(simBookNode, "Nom", simBook.child_value("title"));
+                        miArbol.insert(simBookNode, "Id", simBook.child_value("id"));
                         miArbol.insert(simBookNode, "isbn", simBook.child_value("isbn"));
                         miArbol.insert(simBookNode, "F", simBook.child_value("publication_year"));
                     }
@@ -76,10 +77,10 @@ int main() {
 
   
     std::chrono::duration<double> duracionSegundos = tiempoFin - tiempoInicio;
-    std::cout << "Carga completada con éxito." << std::endl;
-    std::cout << "Cantidad total de nodos creados en el árbol: " << miArbol.size() << std::endl;
 
     std::cout << "Tiempo total de carga: " << duracionSegundos.count() << " segundos." << std::endl;
-
+    // listamos los id de los libros cargados en el arbol, para verificar que se cargaron correctamente
+    std::cout << "Lista de IDs de los libros:" << std::endl;
+    miArbol.listar();
     return 0;
 }
