@@ -205,9 +205,72 @@ void Tree::borrar_ratings(float r) {
     }
     }
 
-std::vector<std::string> Tree::precursores(std::string id) {
-    std::vector<std::string> resultado;
-    return resultado;
+void Tree::precursores() { // lista los id de los libros cuyos libros similares son todos posteriores a ellos
+    std::vector<std::string> ids;
+    if (!rootNode) {
+        std::cout << "[]" << std::endl;
+        return;
+    }
+
+    for (Node* libro : rootNode->children) { // iteramos por los hijos de la raiz total
+        if (libro->etiqueta != "L") continue;
+
+        int año_original = -1; // si no se encuentra el año de publicacion, se considera invalido y se ignora ese libro
+        Node* similares = nullptr;
+
+        for (Node* atributo : libro->children) { // iteramos por los atributos del libro para encontrar el año de publicacion y el nodo de libros similares
+            if (atributo->etiqueta == "F") {
+                try {
+                    año_original = std::stoi(atributo->valor);
+                } catch (...) {
+                    año_original = -1;
+                }
+            } else if (atributo->etiqueta == "S") {
+                similares = atributo;
+            }
+        }
+
+        if (año_original == -1) continue; // si no se encontró un año de publicación válido, se ignora este libro
+        bool todos_posteriores = true; // asumimos que todos los similares son posteriores hasta que se demuestre lo contrario
+
+        if (similares) { // si el libro tiene similares, verificamos sus años de publicación
+            for (Node* libro_similar : similares->children) {
+                if (libro_similar->etiqueta != "Ls") continue;
+
+                for (Node* atributo_similar : libro_similar->children) { // iteramos por los atributos del libro similar para encontrar su año de publicación
+                    if (atributo_similar->etiqueta == "F") {
+                        try { // intentamos convertir el año de publicación del libro similar a entero
+                            int año_similar = std::stoi(atributo_similar->valor);
+                            if (año_similar <= año_original) {
+                                todos_posteriores = false;
+                            }
+                        } catch (...) { // si no se pudo convertir el año de publicación del libro similar a entero, se considera inválido y se ignora ese libro similar
+                            todos_posteriores = false;
+                        }
+                        break;
+                    }
+                }
+
+                if (!todos_posteriores) break;
+            }
+        }
+
+        if (todos_posteriores) { // si todos los libros similares son posteriores, se añade el id del libro original a la lista de ids a imprimir
+            for (Node* atributo : libro->children) {
+                if (atributo->etiqueta == "Id" && !atributo->valor.empty()) {
+                    ids.push_back(atributo->valor);
+                    break;
+                }
+            }
+        }
+    }
+
+    std::cout << "["; // finalmente, se imprime la lista de ids con los libros cuyos similares son posteriores
+    for (size_t i = 0; i < ids.size(); ++i) {
+        std::cout << ids[i];
+        if (i + 1 < ids.size()) std::cout << ", ";
+    }
+    std::cout << "]" << std::endl;
 }
 
 

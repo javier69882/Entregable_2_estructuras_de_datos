@@ -66,6 +66,7 @@ public:
     //funciones que pide el enunciado
     void listar();
     void borrar_ratings(float r);
-    std::vector<std::string> precursores(std::string id);
+    void listar_similares_posteriores();
+    void precursores();
 };
 #endif
