@@ -90,6 +90,7 @@ int main() {
     std::chrono::duration<double> duracionSegundos = tiempoFin - tiempoInicio;
 
     std::cout << "Tiempo total de carga: " << duracionSegundos.count() << " segundos." << std::endl;
+    std::cout << "Cantidad total de nodos creados en el árbol: " << miArbol.size() << std::endl;
     //std::cout << "IDs de libros que cuelgan directamente de la raiz total:" << std::endl;
     //miArbol.listar();
     //miArbol.borrar_ratings(4.0);
