@@ -11,7 +11,7 @@ namespace fs = std::filesystem;
 void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
     Tree::Node* nodoRaiz = miArbol.getRoot(); 
     
-    // 1. Guardar todos los archivos en un vector temporal
+    //Guardar todos los archivos en un vector temporal
     std::vector<fs::directory_entry> archivos;
     for (const auto& entry : fs::directory_iterator(rutaCarpeta)) {
         if (fs::is_regular_file(entry.status())) {
@@ -19,7 +19,7 @@ void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
         }
     }
 
-    // 2. Ordenar el vector numéricamente
+    //Ordenar el vector numericamente
     std::sort(archivos.begin(), archivos.end(), [](const fs::directory_entry& a, const fs::directory_entry& b) {
         try {
             int numA = std::stoi(a.path().stem().string());
@@ -30,7 +30,7 @@ void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
         }
     });
 
-    // 3. Iterar y procesar solo los primeros 10000 ordenados
+    //Iterar y procesar solo los primeros 10000 ordenados
     int contador = 0;
     for (const auto& entry : archivos) {
         if (contador >= 10000) break; 
@@ -59,7 +59,7 @@ void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
                 for (pugi::xml_node simBook = xmlSimilarBooks.child("book"); simBook; simBook = simBook.next_sibling("book")) {
                     Tree::Node* simBookNode = miArbol.insert(similaresNode, "Ls");
 
-                    // También agregué el Id de los libros similares para que quede igual al diagrama
+                    
                     miArbol.insert(simBookNode, "Id", simBook.child_value("id")); 
                     miArbol.insert(simBookNode, "Nom", simBook.child_value("title"));
                     miArbol.insert(simBookNode, "isbn", simBook.child_value("isbn"));
@@ -73,14 +73,14 @@ void cargarDatosEnArbol(Tree& miArbol, const std::string& rutaCarpeta) {
     }
 }
 int main() {
-    // iniciamos el arbol con un nodo raiz "total"
+    //iniciamos el arbol con un nodo raiz "total"
     Tree miArbol("total");
     // ruta del directorio con los archivos xml
     std::string ruta = "./books_xml"; 
     
     std::cout << "Iniciando la carga de los archivos XML en el arbol..." << std::endl;
-  //medimos el tiempo de carga de los datos en el arbol, en mi pc dio 26.8263 segundos para los 10000 archivos xml
-  // ademas en mi pc se crearon   676969
+  //medimos el tiempo de carga de los datos en el arbol, en mi pc dio 33 segundos para los 10000 archivos xml
+  //ademas en mi pc se crearon   821211
     auto tiempoInicio = std::chrono::high_resolution_clock::now();
     cargarDatosEnArbol(miArbol, ruta);
 
