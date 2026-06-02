@@ -151,6 +151,16 @@ std::vector<std::string> Tree::inOrder() {
     */
 
 //funciones que pide el enunciado
+
+/*
+Lista por consola los id de todos los libros en el arbol
+La funcion recorre el arbol en preorder para obtener todos los nodos,
+filtra los nodos para encontrar los que cuelgan directamente de la raiz total y tienen etiqueta "L" (libro),
+luego busca el nodo hijo con etiqueta id y extrae su valor.
+Imprime los ids en formato [id1, id2, id3]
+
+
+*/
 void Tree::listar() { // lista los id de los libros que cuelgan directamente de la raiz total, en formato [id1, id2, id3]
     if (!rootNode) return;
     std::vector<Node*> nodos = preOrder(); // se recorre el arbol en preorder para obtener todos los nodos en un vector
@@ -179,6 +189,15 @@ void Tree::listar() { // lista los id de los libros que cuelgan directamente de 
     std::cout << "]" << std::endl;
 }
 
+
+/*
+Elimina del arbol todos los libros cuyo rating promedio es menor o igual a r
+La funcion recorre los hijos de la raiz total para encontar los nodos de libros, luego busca
+en sus hijo el nodo con etiqueta average_rating, convierte su valor a float.
+Si el rating es menor o igual a r, se añade el nodo del libro a un vector de nodos a borrar
+Luego se itera por el vector de nodos a borrar y se llama a remove para eliminar cada nodo del arbol, lo que borra el nodo y todo su subarbol de atributos
+
+*/
 void Tree::borrar_ratings(float r) {
     if(!rootNode) return;
     //vector para amacenar los nodos a borrar
@@ -204,7 +223,13 @@ void Tree::borrar_ratings(float r) {
         remove(libro);
     }
     }
+/*  
+Identifica y lista los id de los libros que son mas antiguos que sus libros similares
+Analiza cada libro que cuelga directo de la raiz total y extrae su año de publicacion nodo F
+Luego revisa los similares de ese libro en nodo S  Y LS, compara los años de publicacion
+Imprime todos los libros que cumplen la condicion
 
+*/
 void Tree::precursores() { // lista los id de los libros cuyos libros similares son todos posteriores a ellos
     std::vector<std::string> ids;
     if (!rootNode) {

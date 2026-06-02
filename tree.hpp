@@ -25,8 +25,22 @@ struct Libro{ // almacena la informacion del xml sobre los libros
 };
 */
 
+
+
+/*
+clase arbol
+estructura de datos de arbol N-ario, para almacenar y gestionar la informacion de un xml
+esta clase implementa un arbol donde cada nodo puede tener una cantidad dinamica de hijos,
+almacenados en un vector. Esta pensado para almacenar los libros de los xml 
+L para libro, ID para identificador, ETC, y sus valores correspondiente, clave valor
+Incluye metodos de insercion, eliminacion, busqueda, recorrido preorder, ademas de un metodo para imprimir el arbol en consola
+
+*/
 class Tree {
 public:
+    /*
+    struct Node representa cada nodo del arbol, con una etiqueta y un valor, ademas de un puntero al nodo padre y un vector de punteros
+    */ 
     struct Node {
         std::string etiqueta; //libro, id, nombre, etc
         std::string valor;    //valor para el tag, titulo, numero, etc
